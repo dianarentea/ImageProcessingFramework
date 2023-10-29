@@ -7,7 +7,7 @@
         xmlns:convert="clr-namespace:Framework.Converters"
         mc:Ignorable="d"
         Title="Image Processing"
-        Height="750"
+        Height="650"
         Width="1200"
         WindowStartupLocation="CenterScreen"
         Icon="../Images/Icon.png">
@@ -163,21 +163,48 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.InvertImageCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Mirror" 
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.MirrorImageCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="RotateClockwise" 
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.RotateClockwiseImageCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="RotateAntiClockwise" 
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.RotateAnticlockwiseImageCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
                 <MenuItem Header="Transform to gray image"
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.ConvertImageToGrayscaleCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem Header="Thresholding"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.ThresholdingCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
             <MenuItem Header="Pointwise operations"
                       Background="{Binding Path=Theme.MenuItemBackgroundColor}"
                       Foreground="{Binding Path=Theme.MenuItemForegroundColor}">
-
+                <MenuItem Header="Contrast"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.ContrastCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                <MenuItem  Header="Brightness"
+                           Foreground="#1E1E1E"
+                            Command="{Binding Path=MenuCommands.BrightnessCommand}"
+                            CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
             <MenuItem Header="Thresholding"
                       Background="{Binding Path=Theme.MenuItemBackgroundColor}"
                       Foreground="{Binding Path=Theme.MenuItemForegroundColor}">
+                <MenuItem Header="Otsu 2 praguri"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.ThresholdingOtsuCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
 
             </MenuItem>
 
@@ -242,6 +269,7 @@
                    TextAlignment="Center"
                    Height="20"
                    Width="120"/>
+        
 
         <Label Grid.Column="0"
                Grid.Row="2"
@@ -253,6 +281,8 @@
                BorderThickness="5"
                VerticalContentAlignment="Center"
                HorizontalContentAlignment="Center">
+          
+
             <ScrollViewer x:Name="scrollViewerInitial"
                           HorizontalScrollBarVisibility="Auto" 
                           VerticalScrollBarVisibility="Auto" 
@@ -263,6 +293,9 @@
                         Width="{Binding Path=OriginalCanvasWidth}"
                         Height="{Binding Path=OriginalCanvasHeight}"
                         MouseLeftButtonDown="CanvasMouseLeftButtonDown">
+
+                  
+                    
                     <Image x:Name="initialImage"
                            RenderOptions.BitmapScalingMode="NearestNeighbor"
                            Mouse.MouseMove="ImageMouseMove"
@@ -313,10 +346,16 @@
             </ScrollViewer>
         </Label>
 
+
+
         <Grid Grid.Row="3"
                     Grid.ColumnSpan="2"
                     Height="40"
                     Margin="10,0,10,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="321*"/>
+                <ColumnDefinition Width="859*"/>
+            </Grid.ColumnDefinitions>
             <Button Content="Reset"
                     Command="{Binding Path=ResetZoomCommand}"
                     Foreground="{Binding Path=Theme.ButtonForegroundColor}"
@@ -325,7 +364,7 @@
                     BorderThickness="2"
                     HorizontalAlignment="Left"
                     Height="35"
-                    Width="80"/>
+                    Width="80" Margin="0,2,0,2"/>
             <Slider x:Name="sliderZoom"
                     Orientation="Horizontal"
                     Foreground="{Binding Path=Theme.TextForeground}"
@@ -338,9 +377,9 @@
                     TickPlacement="BottomRight"
                     Cursor="Hand"
                     ValueChanged="SliderZoom_ValueChanged"
-                    Margin="100,0,100,0"
+                    Margin="100,5,100,5"
                     Height="30"
-                    Width="auto"/>
+                    Width="auto" Grid.ColumnSpan="2"/>
             <TextBlock Text="{Binding Path=Value, ElementName=sliderZoom, StringFormat=N2}" 
                        Foreground="{Binding Path=Theme.TextForeground}"
                        FontSize="15"
@@ -348,7 +387,7 @@
                        HorizontalAlignment="Right"
                        Height="30"
                        Width="50"
-                       Margin="0,0,40,5"/>
+                       Margin="0,2,40,8" Grid.Column="1"/>
             <TextBlock Text="x"
                        Foreground="{Binding Path=Theme.TextForeground}"
                        FontSize="15"
@@ -356,7 +395,7 @@
                        HorizontalAlignment="Right"
                        Height="30"
                        Width="30"
-                       Margin="0,0,20,5"/>
+                       Margin="0,2,20,8" Grid.Column="1"/>
         </Grid>
 
         <Grid Grid.Column="0"

@@ -1,6 +1,5 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
-
 using static System.Math;
 
 namespace Algorithms.Utilities
@@ -97,11 +96,43 @@ namespace Algorithms.Utilities
         }
         #endregion
 
+        #region Compute relative histogram
+        public static double[] ComputeRelativeHistogram(Image<Gray, byte> inputImage)
+        {
+        
+            int[] histogram = ComputeHistogram(inputImage);
+            double[] relativeHistogram = new double[256];
+
+            int totalPixels = inputImage.Width * inputImage.Height;
+
+            for (int i = 0; i < 256; i++)
+            {
+                relativeHistogram[i] = (double)histogram[i] / totalPixels;
+            }
+
+            return relativeHistogram;
+        }
+
+        public static double[] ComputeRelativeHistogram(Image<Bgr, byte> inputImage, int channel)
+        {
+            int[] histogram = ComputeHistogram(inputImage, channel);
+            double[] relativeHistogram = new double[256];
+            int totalPixels = inputImage.Width * inputImage.Height;
+            for (int i = 0; i < 256; i++)
+            {
+                relativeHistogram[i] = (double)histogram[i] / totalPixels;
+            }
+            return relativeHistogram;
+        }
+        #endregion
+
         #region Swap
         public static void Swap<T>(ref T lhs, ref T rhs)
         {
             (rhs, lhs) = (lhs, rhs);
         }
         #endregion
+
+
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using Framework.View;
 using Framework.Model;
 using Framework.Utilities;
+using System.Globalization;
 
 namespace Framework.ViewModel
 {
@@ -28,6 +29,7 @@ namespace Framework.ViewModel
         public List<double> GetValues()
         {
             var values = new List<double>();
+            CultureInfo culture = new CultureInfo("en-US");
 
             foreach (var parameter in Parameters)
             {
@@ -35,7 +37,7 @@ namespace Framework.ViewModel
                 if (text == null || text.Trim().Length == 0 || IsNumeric(text) == false)
                     values.Add(0);
                 else
-                    values.Add(double.Parse(text));
+                    values.Add(double.Parse(text,culture));
             }
 
             return values;

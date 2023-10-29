@@ -16,6 +16,9 @@ using static Framework.Converters.ImageConverter;
 using Algorithms.Sections;
 using Algorithms.Tools;
 using Algorithms.Utilities;
+using System.Collections.Generic;
+using System;
+using System.Globalization;
 
 namespace Framework.ViewModel
 {
@@ -559,6 +562,173 @@ namespace Framework.ViewModel
         }
         #endregion
 
+        #region Mirror image
+        private ICommand _mirrorImageCommand;
+        public ICommand  MirrorImageCommand
+        {
+            get
+            {
+                if (_mirrorImageCommand == null)
+                    _mirrorImageCommand = new RelayCommand(MirrorImage);
+                return _mirrorImageCommand;
+            }
+        }
+        private void MirrorImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.Mirror(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.Mirror(ColorInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+        #endregion
+
+        #region Rotate clockwise image
+
+        private ICommand _rotateClockwiseImageCommand;
+        public ICommand RotateClockwiseImageCommand
+        {
+            get
+            {
+                if (_rotateClockwiseImageCommand == null)
+                    _rotateClockwiseImageCommand = new RelayCommand(RotateClockwiseImage);
+                return _rotateClockwiseImageCommand;
+            }
+        }
+
+        private void RotateClockwiseImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.RotateClockwise(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.RotateClockwise(ColorInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+
+
+        #endregion
+
+        #region Rotate Anticlockwise image
+
+        private ICommand _rotateAnticlockwiseImageCommand;
+
+        public ICommand RotateAnticlockwiseImageCommand
+        {
+            get
+            {
+                if (_rotateAnticlockwiseImageCommand == null)
+                    _rotateAnticlockwiseImageCommand = new RelayCommand(RotateAnticlockwiseImage);
+                return _rotateAnticlockwiseImageCommand;
+            }
+        }
+        private void RotateAnticlockwiseImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.RotateAntiClockwise(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.RotateAntiClockwise(ColorInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+
+        #endregion
+
+        #region Crop Image
+        private ICommand _cropImageCommand;
+        public ICommand CropImageCommand
+        {
+            get
+            {
+                if (_cropImageCommand == null)
+                    _cropImageCommand = new RelayCommand(CropImage);
+                return _cropImageCommand;
+            }
+        }
+        private void CropImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            if (VectorOfMousePosition.Count > 1)
+            {
+                int pos = VectorOfMousePosition.Count - 1;
+                Point firstClick = VectorOfMousePosition[pos];
+                Point secondClick = VectorOfMousePosition[pos - 1];
+
+                double minWidth = Math.Min(firstClick.Y, secondClick.Y);
+                double maxWidth = Math.Max(firstClick.Y, secondClick.Y);
+                double minHeight = Math.Min(firstClick.X, secondClick.X);
+                double maxHeight = Math.Max(firstClick.X, secondClick.X);
+
+                Point start = new Point(minHeight, minWidth);
+                Point end = new Point(maxHeight, maxWidth);
+
+                if (parameter is object[] parameters && parameters.Length == 2)
+                {
+
+                    Canvas initialCanvas = parameters[0] as Canvas;
+                    Canvas processedCanvas = parameters[1] as Canvas;
+
+                    ClearProcessedCanvas(processedCanvas);
+                    ClearProcessedCanvas(initialCanvas);
+
+                    DrawRectangle(initialCanvas, start, end, 5, Brushes.Red, ScaleValue);
+
+                    if (GrayInitialImage != null)
+                    {
+                        GrayProcessedImage = Tools.CropImage(GrayInitialImage, (int)start.X, (int)start.Y, (int)end.X, (int)end.Y);
+                        ProcessedImage = Convert(GrayProcessedImage);
+                    }
+                    else if (ColorInitialImage != null)
+                    {
+                        ColorProcessedImage = Tools.CropImage(ColorInitialImage, (int)start.X, (int)start.Y, (int)end.X, (int)end.Y);
+                        ProcessedImage = Convert(ColorProcessedImage);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select at least two points");
+            }
+        }
+        #endregion
+
         #region Convert color image to grayscale image
         private ICommand _convertImageToGrayscaleCommand;
         public ICommand ConvertImageToGrayscaleCommand
@@ -596,9 +766,175 @@ namespace Framework.ViewModel
         #endregion
 
         #region Pointwise operations
+
+        #region Contrast
+
+        private ICommand _ContrastCommand;
+        public ICommand ContrastCommand
+        {
+            get
+            {
+                if (_ContrastCommand == null)
+                    _ContrastCommand = new RelayCommand(ContrastChange);
+                return _ContrastCommand;
+            }
+        }
+
+        private void ContrastChange(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+
+            List<string> parameters = new List<string>();
+            parameters.Add("Add E value: ");
+            parameters.Add("Add m value:");
+            DialogBox box = new DialogBox(_mainVM, parameters);
+            box.ShowDialog();
+            List<double> values = box.GetValues();
+
+
+            if (values!=null)
+            {
+                if (GrayInitialImage != null)
+                {
+                    int[] lut = Tools.CalculateLUT(values[0], values[1]);
+                    GrayProcessedImage = Tools.ApplyLUT(GrayInitialImage, lut);
+                    ProcessedImage = Convert(GrayProcessedImage);
+                }
+                else if (ColorInitialImage != null)
+                {
+                    int[] lut = Tools.CalculateLUT(values[0], values[1]);
+                    ColorProcessedImage = Tools.ApplyLUT(ColorInitialImage, lut);
+                    ProcessedImage = Convert(ColorProcessedImage);
+                }
+            }
+        }
+
+        private ICommand _brightnessCommand;
+        public ICommand BrightnessCommand
+        {
+            get
+            {
+                if (_brightnessCommand == null)
+                    _brightnessCommand = new RelayCommand(Brightness);
+                return _brightnessCommand;
+            }
+        }
+        private void Brightness
+            (object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+         
+            ClearProcessedCanvas(parameter);
+
+            if (GrayInitialImage != null)
+            {
+                int[] lut = Tools.CalculateLUT(2.5, 50);
+                GrayProcessedImage = Tools.ApplyLUT(GrayInitialImage, lut);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                int[] lut = Tools.CalculateLUT(2.5, 50);
+                ColorProcessedImage = Tools.ApplyLUT(ColorInitialImage, lut);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+
+        }
+
+
+        #endregion
         #endregion
 
         #region Thresholding
+        private ICommand _thresholdingCommand;
+        public ICommand ThresholdingCommand
+        {
+            get
+            {
+                if (_thresholdingCommand == null)
+                    _thresholdingCommand = new RelayCommand(ThresholdingImage);
+                return _thresholdingCommand;
+            }
+        }
+        private void ThresholdingImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            List<string> parameters = new List<string>();
+            parameters.Add("Threshold");
+            DialogBox box = new DialogBox(_mainVM, parameters);
+            box.ShowDialog();
+            List<double> values = box.GetValues();
+            if (values != null)
+            {
+                byte threshold = (byte)(values[0] + 0.5);
+                if (GrayInitialImage != null)
+                {
+                    GrayProcessedImage = Tools.Thresholding(GrayInitialImage,
+                    threshold);
+                    ProcessedImage = Convert(GrayProcessedImage);
+                }
+                else if (ColorInitialImage != null)
+                {
+                    // Conversie BGR -> Grayscale
+                    GrayProcessedImage = Tools.Convert(ColorInitialImage);
+                    GrayProcessedImage = Tools.Thresholding(GrayProcessedImage,
+                    threshold);
+                    ProcessedImage = Convert(GrayProcessedImage);
+                }
+            }
+        }
+
+        private ICommand _thresholdingOtsuCommand;
+        public ICommand ThresholdingOtsuCommand
+        {
+            get
+            {
+                if (_thresholdingOtsuCommand == null)
+                    _thresholdingOtsuCommand = new RelayCommand(ThresholdingOtsuImage);
+                return _thresholdingOtsuCommand;
+            }
+        }
+        private void ThresholdingOtsuImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            if (GrayInitialImage != null)
+            {
+                Tuple<int,int> result= Tools.OtsuDoubleThreshold(Utils.ComputeRelativeHistogram(GrayInitialImage));
+                int t1= result.Item1;
+                int t2 = result.Item2;
+                GrayProcessedImage = Tools.twoThresholding(GrayInitialImage, t1, t2);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                // Conversie BGR -> Grayscale
+                GrayProcessedImage = Tools.Convert(ColorInitialImage);
+               // GrayProcessedImage = Tools.ThresholdingOtsu(GrayProcessedImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+        }   
+
+
+
         #endregion
 
         #region Filters
