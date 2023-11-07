@@ -956,8 +956,8 @@ namespace Framework.ViewModel
             }
             ClearProcessedCanvas(parameter);
             List<string> parameters = new List<string>();
-            parameters.Add("Sigma color");
-            parameters.Add("Sigma space");
+            parameters.Add("Sigma 1");
+            parameters.Add("Sigma 2");
             DialogBox box = new DialogBox(_mainVM, parameters);
             box.ShowDialog();
             List<double> values = box.GetValues();
