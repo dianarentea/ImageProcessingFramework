@@ -355,6 +355,27 @@ namespace Algorithms.Tools
 
         #region Filters
 
+        public static Image<Gray, byte> BilateralFilterGray(Image<Gray, byte> inputImage, double sigmaR, double sigmaD)
+        {
+
+            int D = (int)(3.5 * sigmaD);
+            Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
+
+            // Call the BilateralFilter method with calculated D
+            CvInvoke.BilateralFilter(inputImage, result, D, sigmaD, sigmaR);
+
+            return result;
+        }
+        public static Image<Bgr, byte> BilateralFilterColor(Image<Bgr, byte> inputImage, double sigmaD, double sigmaR)
+        {
+            int D = (int)(3.5 * sigmaD);
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+
+            // Call the BilateralFilter method with calculated D
+            CvInvoke.BilateralFilter(inputImage, result, D, sigmaR, sigmaD);
+
+            return result;
+        }
         //public static Image<Gray, byte> BilateralFilterGray(Image<Gray, byte> inputImage, double sigmaD, double sigmaR)
         //{
         //    int D = (int)(3.5 * sigmaD);
@@ -390,27 +411,6 @@ namespace Algorithms.Tools
 
         //    return result;
         //}
-        public static Image<Gray, byte> BilateralFilterGray(Image<Gray, byte> inputImage, double sigmaR, double sigmaD)
-        {
-
-            int D = (int)(3.5 * sigmaD);
-            Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
-
-            // Call the BilateralFilter method with calculated D
-            CvInvoke.BilateralFilter(inputImage, result, D, sigmaD, sigmaR);
-
-            return result;
-        }
-        public static Image<Bgr, byte> BilateralFilterColor(Image<Bgr, byte> inputImage, double sigmaD, double sigmaR)
-        {
-            int D = (int)(3.5 * sigmaD);
-            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
-
-            // Call the BilateralFilter method with calculated D
-            CvInvoke.BilateralFilter(inputImage, result, D, sigmaR, sigmaD);
-
-            return result;
-        }
 
         //public static Image<Bgr, byte> BilateralFilterColor(Image<Bgr, byte> inputImage, double sigmaD, double sigmaR)
         //{
