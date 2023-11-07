@@ -926,18 +926,57 @@ namespace Framework.ViewModel
             }
             else if (ColorInitialImage != null)
             {
-                // Conversie BGR -> Grayscale
-                GrayProcessedImage = Tools.Convert(ColorInitialImage);
-               // GrayProcessedImage = Tools.ThresholdingOtsu(GrayProcessedImage);
-                ProcessedImage = Convert(GrayProcessedImage);
+                MessageBox.Show("The image must be grayscale !");
+                return;
             }
-        }   
+        }
 
 
 
         #endregion
 
         #region Filters
+        private ICommand _bilateralFilter;
+        public ICommand BilateralFilter
+        {
+            get
+            {
+                if (_bilateralFilter == null)
+                    _bilateralFilter = new RelayCommand(BilateralFilterImage);
+                return _bilateralFilter;
+            }
+        }
+
+      private void BilateralFilterImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            List<string> parameters = new List<string>();
+            parameters.Add("Sigma color");
+            parameters.Add("Sigma space");
+            DialogBox box = new DialogBox(_mainVM, parameters);
+            box.ShowDialog();
+            List<double> values = box.GetValues();
+            if (values != null)
+            {
+                if (GrayInitialImage != null)
+                {
+                    GrayProcessedImage = Tools.BilateralFilterGray(GrayInitialImage, values[0], values[1]);
+                    ProcessedImage = Convert(GrayProcessedImage);
+                }
+                else if (ColorInitialImage != null)
+                {
+                  
+                    ColorProcessedImage = Tools.BilateralFilterColor(ColorInitialImage, values[0], values[1]);
+                    ProcessedImage = Convert(ColorProcessedImage);
+                }
+            }
+        }   
+
         #endregion
 
         #region Morphological operations

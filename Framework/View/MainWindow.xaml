@@ -219,6 +219,10 @@
                           Foreground="#1E1E1E">
 
                 </MenuItem>
+                <MenuItem Header="Filtrul bilateral"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.BilateralFilter}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
             </MenuItem>
 
             <MenuItem Header="Morphological operations"
