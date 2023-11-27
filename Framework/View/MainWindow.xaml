@@ -224,9 +224,12 @@
                     <MenuItem Header="Canny operator">
                         <MenuItem Header="Gradient magnitude image - Smoothing"
                           Foreground="#1E1E1E"
-                          Command="{Binding Path=MenuCommands.SmoothFilter}"
+                          Command="{Binding Path=MenuCommands.SmoothFilterCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
-                        <MenuItem Header="Angle image - Highpass filtering"/>
+                        <MenuItem Header="Angle image - Sobel filter"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.SobelFilterCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
                         <MenuItem Header="Non-maximum suppression"/>
                         <MenuItem Header="Hysteresis thresholding"/>
                         <MenuItem Header="Canny"/>

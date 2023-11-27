@@ -979,14 +979,15 @@ namespace Framework.ViewModel
         #endregion
 
         #region High-Pass filters
-        private ICommand _smoothFilter;
-        public ICommand SmoothFilter
+
+        private ICommand _smoothFilterCommand;
+        public ICommand SmoothFilterCommand
         {
             get
             {
-                if (_smoothFilter == null)
-                    _smoothFilter = new RelayCommand(SmoothFilterImage);
-                return _smoothFilter;
+                if (_smoothFilterCommand == null)
+                    _smoothFilterCommand = new RelayCommand(SmoothFilterImage);
+                return _smoothFilterCommand;
             }
         }
 
@@ -1017,6 +1018,38 @@ namespace Framework.ViewModel
                 }
             }
         }
+
+        private ICommand _sobelFilterCommand;
+        public ICommand SobelFilterCommand
+        {
+            get
+            {
+                if (_sobelFilterCommand == null)
+                    _sobelFilterCommand = new RelayCommand(SobelFilterImage);
+                return _sobelFilterCommand;
+            }
+        }
+        private void SobelFilterImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+                if (GrayInitialImage != null)
+                {
+                    GrayProcessedImage = Filters.SobelFilter(GrayInitialImage);
+                    ProcessedImage = Convert(GrayProcessedImage);
+                }
+                else if (ColorInitialImage != null)
+                {
+                    //ColorProcessedImage = Filters.SmoothFilterColor(ColorInitialImage, values[0]);
+                    //ProcessedImage = Convert(ColorProcessedImage);
+               }
+            
+        }
+
         #endregion
 
         #endregion

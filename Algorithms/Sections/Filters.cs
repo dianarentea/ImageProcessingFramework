@@ -97,6 +97,7 @@ namespace Algorithms.Sections
             return filteredImage;
         }
         #endregion
+
         public static Image<Gray, byte> GaussianFilter(Image<Gray, byte> inputImage, double sigma)
         {
             int kernelSize = (int)(4 * sigma);
@@ -133,6 +134,34 @@ namespace Algorithms.Sections
 
             return result;
         }
+
+        public static Image<Gray, byte> SobelFilter(Image<Gray, byte> inputImage)
+        {
+            Image<Gray, byte> result = inputImage.Clone();
+
+            for (int u = 1; u < inputImage.Rows - 1; u++)
+            {
+                for (int v = 1; v < inputImage.Cols - 1; v++)
+                {
+                    //masca pentru contururi orizontale
+                    double Sx = inputImage[u + 1, v - 1].Intensity - inputImage[u - 1, v - 1].Intensity +
+                                 2 * inputImage[u + 1, v].Intensity - 2 * inputImage[u - 1, v].Intensity +
+                                 inputImage[u + 1, v + 1].Intensity - inputImage[u - 1, v + 1].Intensity;
+
+                    //masca pentru contururi verticale
+                    double Sy = inputImage[u - 1, v + 1].Intensity - inputImage[u - 1, v - 1].Intensity +
+                                 2 * inputImage[u, v + 1].Intensity - 2 * inputImage[u, v - 1].Intensity +
+                                 inputImage[u + 1, v + 1].Intensity - inputImage[u + 1, v - 1].Intensity;
+
+                    double G = Math.Sqrt(Sx * Sx + Sy * Sy); //imagine gradient Grad(x,y)
+
+                    result[u, v] = new Gray(G);
+                }
+            }
+
+            return result;
+        }
+
 
 
     }
