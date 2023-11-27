@@ -97,26 +97,43 @@ namespace Algorithms.Sections
             return filteredImage;
         }
         #endregion
-        public static Image<Gray, byte> SmoothFilterGray(Image<Gray, byte> inputImage, int filterSize)
+        public static Image<Gray, byte> GaussianFilter(Image<Gray, byte> inputImage, double sigma)
         {
-            Image<Gray, byte> outputImage = new Image<Gray, byte>(inputImage.Size);
-            int halfFilterSize = filterSize / 2;
-            for (int y = halfFilterSize; y < inputImage.Height - halfFilterSize; ++y)
+            int kernelSize = (int)(4 * sigma);
+            if(kernelSize % 2 == 0)
             {
-                for (int x = halfFilterSize; x < inputImage.Width - halfFilterSize; ++x)
+                kernelSize++;
+            }
+            int halfKernel = kernelSize / 2;
+
+            Image<Gray, byte> result = inputImage.Clone();
+
+            for (int u = halfKernel; u < inputImage.Rows - halfKernel; u++)
+            {
+                for (int v = halfKernel; v < inputImage.Cols - halfKernel; v++)
                 {
-                    double sum = 0;
-                    for (int i = -halfFilterSize; i <= halfFilterSize; ++i)
+                    double S = 0; // Suma valorilor pixelilor ponderată
+                    double W = 0; // Suma ponderilor
+
+                    for (int m = -halfKernel; m <= halfKernel; m++)
                     {
-                        for (int j = -halfFilterSize; j <= halfFilterSize; ++j)
+                        for (int n = -halfKernel; n <= halfKernel; n++)
                         {
-                            sum += inputImage[y + i, x + j].Intensity;
+                            double b = inputImage[u + m, v + n].Intensity; // Valoarea pixelului din vecinătate
+                            double wr = Math.Exp(-((m * m + n * n) / (2.0 * sigma * sigma))); // Coeficientul Gaussian în domeniul valorilor pixelilor
+                            double w = wr; // Ponderarea Gaussiană
+                            S += w * b;
+                            W += w;
                         }
                     }
-                    outputImage[y, x] = new Gray(sum / (filterSize * filterSize));
+
+                    result[u, v] = new Gray(S / W);
                 }
             }
-            return outputImage;
+
+            return result;
         }
+
+
     }
 }

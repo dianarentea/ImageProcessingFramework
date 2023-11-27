@@ -1007,8 +1007,8 @@ namespace Framework.ViewModel
             {
                 if (GrayInitialImage != null)
                 {
-                    //GrayProcessedImage = Filters.SmoothFilterGray(GrayInitialImage, values[0]);
-                    //ProcessedImage = Convert(GrayProcessedImage);
+                    GrayProcessedImage = Filters.GaussianFilter(GrayInitialImage, values[0]);
+                    ProcessedImage = Convert(GrayProcessedImage);
                 }
                 else if (ColorInitialImage != null)
                 {
