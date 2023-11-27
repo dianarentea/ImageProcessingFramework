@@ -883,7 +883,7 @@ namespace Framework.ViewModel
                 byte threshold = (byte)(values[0] + 0.5);
                 if (GrayInitialImage != null)
                 {
-                    GrayProcessedImage = Tools.Thresholding(GrayInitialImage,
+                    GrayProcessedImage = Thresholding.ThresholdingMethod(GrayInitialImage,
                     threshold);
                     ProcessedImage = Convert(GrayProcessedImage);
                 }
@@ -891,7 +891,7 @@ namespace Framework.ViewModel
                 {
                     // Conversie BGR -> Grayscale
                     GrayProcessedImage = Tools.Convert(ColorInitialImage);
-                    GrayProcessedImage = Tools.Thresholding(GrayProcessedImage,
+                    GrayProcessedImage = Thresholding.ThresholdingMethod(GrayProcessedImage,
                     threshold);
                     ProcessedImage = Convert(GrayProcessedImage);
                 }
@@ -918,10 +918,10 @@ namespace Framework.ViewModel
             ClearProcessedCanvas(parameter);
             if (GrayInitialImage != null)
             {
-                Tuple<int,int> result= Tools.OtsuDoubleThreshold(Utils.ComputeRelativeHistogram(GrayInitialImage));
+                Tuple<int,int> result= Thresholding.OtsuDoubleThreshold(Utils.ComputeRelativeHistogram(GrayInitialImage));
                 int t1= result.Item1;
                 int t2 = result.Item2;
-                GrayProcessedImage = Tools.twoThresholding(GrayInitialImage, t1, t2);
+                GrayProcessedImage = Thresholding.twoThresholding(GrayInitialImage, t1, t2);
                 ProcessedImage = Convert(GrayProcessedImage);
             }
             else if (ColorInitialImage != null)
@@ -936,6 +936,7 @@ namespace Framework.ViewModel
         #endregion
 
         #region Filters
+        #region Low-Pass filters
         private ICommand _bilateralFilter;
         public ICommand BilateralFilter
         {
@@ -946,8 +947,7 @@ namespace Framework.ViewModel
                 return _bilateralFilter;
             }
         }
-
-      private void BilateralFilterImage(object parameter)
+        private void BilateralFilterImage(object parameter)
         {
             if (InitialImage == null)
             {
@@ -965,17 +965,59 @@ namespace Framework.ViewModel
             {
                 if (GrayInitialImage != null)
                 {
-                    GrayProcessedImage = Tools.BilateralFilterGray(GrayInitialImage, values[0], values[1]);
+                    GrayProcessedImage = Filters.BilateralFilterGray(GrayInitialImage, values[0], values[1]);
                     ProcessedImage = Convert(GrayProcessedImage);
                 }
                 else if (ColorInitialImage != null)
                 {
                   
-                    ColorProcessedImage = Tools.BilateralFilterColor(ColorInitialImage, values[0], values[1]);
+                    ColorProcessedImage = Filters.BilateralFilterColor(ColorInitialImage, values[0], values[1]);
                     ProcessedImage = Convert(ColorProcessedImage);
                 }
             }
-        }   
+        }
+        #endregion
+
+        #region High-Pass filters
+        private ICommand _smoothFilter;
+        public ICommand SmoothFilter
+        {
+            get
+            {
+                if (_smoothFilter == null)
+                    _smoothFilter = new RelayCommand(SmoothFilterImage);
+                return _smoothFilter;
+            }
+        }
+
+        private void SmoothFilterImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            List<string> parameters = new List<string>();
+            parameters.Add("Sigma");
+            DialogBox box = new DialogBox(_mainVM, parameters);
+            box.ShowDialog();
+            List<double> values = box.GetValues();
+            if (values != null)
+            {
+                if (GrayInitialImage != null)
+                {
+                    //GrayProcessedImage = Filters.SmoothFilterGray(GrayInitialImage, values[0]);
+                    //ProcessedImage = Convert(GrayProcessedImage);
+                }
+                else if (ColorInitialImage != null)
+                {
+                    //ColorProcessedImage = Filters.SmoothFilterColor(ColorInitialImage, values[0]);
+                    //ProcessedImage = Convert(ColorProcessedImage);
+                }
+            }
+        }
+        #endregion
 
         #endregion
 

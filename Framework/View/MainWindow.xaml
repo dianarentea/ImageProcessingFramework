@@ -213,16 +213,27 @@
                       Foreground="{Binding Path=Theme.MenuItemForegroundColor}">
                 <MenuItem Header="Low-pass"
                           Foreground="#1E1E1E">
+                    <MenuItem Header="Filtrul bilateral"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.BilateralFilter}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
 
                 </MenuItem>
                 <MenuItem Header="High-pass"
                           Foreground="#1E1E1E">
+                    <MenuItem Header="Canny operator">
+                        <MenuItem Header="Gradient magnitude image - Smoothing"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.SmoothFilter}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                        <MenuItem Header="Angle image - Highpass filtering"/>
+                        <MenuItem Header="Non-maximum suppression"/>
+                        <MenuItem Header="Hysteresis thresholding"/>
+                        <MenuItem Header="Canny"/>
+                    </MenuItem>
 
                 </MenuItem>
-                <MenuItem Header="Filtrul bilateral"
-                          Foreground="#1E1E1E"
-                          Command="{Binding Path=MenuCommands.BilateralFilter}"
-                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+              
             </MenuItem>
 
             <MenuItem Header="Morphological operations"
