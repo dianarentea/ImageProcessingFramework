@@ -999,16 +999,17 @@ namespace Framework.ViewModel
                 return;
             }
             ClearProcessedCanvas(parameter);
-            List<string> parameters = new List<string>();
-            parameters.Add("Sigma");
-            DialogBox box = new DialogBox(_mainVM, parameters);
-            box.ShowDialog();
-            List<double> values = box.GetValues();
+            //List<string> parameters = new List<string>();
+            //parameters.Add("Sigma");
+            //DialogBox box = new DialogBox(_mainVM, parameters);
+            //box.ShowDialog();
+            //List<double> values = box.GetValues();
+            double values = 1;
             if (values != null)
             {
                 if (GrayInitialImage != null)
                 {
-                    GrayProcessedImage = Filters.GaussianFilter(GrayInitialImage, values[0]);
+                    GrayProcessedImage = Filters.GaussianFilter(GrayInitialImage, values);
                     ProcessedImage = Convert(GrayProcessedImage);
                 }
                 else if (ColorInitialImage != null)
@@ -1048,6 +1049,36 @@ namespace Framework.ViewModel
                     //ProcessedImage = Convert(ColorProcessedImage);
                }
             
+        }
+
+        private ICommand _angleImageCommand;
+        public ICommand AngleImageCommand
+        {
+            get
+            {
+                if (_angleImageCommand == null)
+                    _angleImageCommand = new RelayCommand(AngleImage);
+                return _angleImageCommand;
+            }
+        }
+        private void AngleImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            if (GrayInitialImage != null)
+            {
+                ColorProcessedImage = Filters.ColorEdgesByOrientation(GrayInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                //ColorProcessedImage = Filters.SmoothFilterColor(ColorInitialImage, values[0]);
+                //ProcessedImage = Convert(ColorProcessedImage);
+            }
         }
 
         #endregion

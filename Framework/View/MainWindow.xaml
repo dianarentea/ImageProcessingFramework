@@ -226,9 +226,13 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.SmoothFilterCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
-                        <MenuItem Header="Angle image - Sobel filter"
+                        <MenuItem Header="Sobel filter"
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.SobelFilterCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                        <MenuItem Header="Angle Image"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.AngleImageCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
                         <MenuItem Header="Non-maximum suppression"/>
                         <MenuItem Header="Hysteresis thresholding"/>

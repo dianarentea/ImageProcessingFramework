@@ -131,7 +131,6 @@ namespace Algorithms.Sections
                     result[u, v] = new Gray(S / W);
                 }
             }
-
             return result;
         }
 
@@ -153,7 +152,10 @@ namespace Algorithms.Sections
                                  2 * inputImage[u, v + 1].Intensity - 2 * inputImage[u, v - 1].Intensity +
                                  inputImage[u + 1, v + 1].Intensity - inputImage[u + 1, v - 1].Intensity;
 
-                    double G = Math.Sqrt(Sx * Sx + Sy * Sy); //imagine gradient Grad(x,y)
+                   
+
+                    double G = Math.Sqrt(Sx*Sx + Sy*Sy); //imagine gradient Grad(x,y)
+                                                            
 
                     result[u, v] = new Gray(G);
                 }
@@ -161,6 +163,85 @@ namespace Algorithms.Sections
 
             return result;
         }
+
+        public static Image<Bgr, byte> ColorEdgesByOrientation(Image<Gray, byte> inputImage)
+        {
+            Image<Bgr, byte> result = inputImage.Clone().Convert<Bgr, byte>();
+
+            for (int u = 1; u < inputImage.Rows - 1; u++)
+            {
+                for (int v = 1; v < inputImage.Cols - 1; v++)
+                {
+                    // Masca pentru contururi orizontale
+                    double Sx = inputImage[u + 1, v - 1].Intensity - inputImage[u - 1, v - 1].Intensity +
+                                 2 * inputImage[u + 1, v].Intensity - 2 * inputImage[u - 1, v].Intensity +
+                                 inputImage[u + 1, v + 1].Intensity - inputImage[u - 1, v + 1].Intensity;
+
+                    // Masca pentru contururi verticale
+                    double Sy = inputImage[u - 1, v + 1].Intensity - inputImage[u - 1, v - 1].Intensity +
+                                 2 * inputImage[u, v + 1].Intensity - 2 * inputImage[u, v - 1].Intensity +
+                                 inputImage[u + 1, v + 1].Intensity - inputImage[u + 1, v - 1].Intensity;
+
+                    double G = Math.Sqrt(Sx * Sx + Sy * Sy); //imagine gradient Grad(x,y)
+                    if (G > 20)                    {
+                        double gradientAngle = Math.Atan2(Sy, Sx);
+
+                        // Atribuim culoarea pixelului în funcție de categoria orientării
+                        Bgr color = GetColorByOrientation(gradientAngle);
+
+                        // Setăm culoarea pixelului în rezultat
+                        result[u, v] = color;
+                    }
+                    else
+                    {
+                        result[u,v]= new Bgr(0, 0, 0);
+                    }
+                }
+            }
+            return result;
+        }
+
+        // Funcție de ajutor pentru a atribui culoarea în funcție de orientare
+        private static Bgr GetColorByOrientation(double angle)
+        {
+            const double pi = Math.PI;
+
+            // Normalizarea la intervalul [-2π, 2π]
+            angle = angle % (2* pi);
+
+            //Rotim unghiul la intervalul[-pi / 2, pi / 2]
+            if (angle > pi / 2)
+            {
+                angle -= pi;
+            }
+            else if (angle <= -pi / 2)
+            {
+                angle += pi;
+            }
+
+            // Atribuim culoarea în funcție de orientare
+            if (angle >= -pi / 8 && angle <= pi / 8)
+            {
+                return new Bgr(0, 0, 255); // Roșu (orizontal)
+            }
+            else if ((angle > -pi / 2 && angle <= - pi / 4) || (angle >=  pi /4 && angle <= pi / 2))
+            {
+                return new Bgr(0, 255, 0); // Verde (vertical)
+            }
+            else if (angle > pi / 8 && angle < 3 * pi / 8)
+            {
+                return new Bgr(255, 0, 0); // Albastru (diagonală 2)
+            }
+            else if (angle > -3 * pi / 8 && angle < -pi / 8)
+            {
+                return new Bgr(0, 255, 255); // Galben (diagonală 1)
+            }
+            else
+            {
+                return new Bgr(0, 0, 0); // Negru pentru orice altceva
+            }
+        }
+
 
 
 
