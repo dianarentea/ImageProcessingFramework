@@ -222,7 +222,7 @@
                 <MenuItem Header="High-pass"
                           Foreground="#1E1E1E">
                     <MenuItem Header="Canny operator">
-                        <MenuItem Header="Gradient magnitude image - Smoothing"
+                        <MenuItem Header="Gradient magnitude image - Gaussian filter"
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.SmoothFilterCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>

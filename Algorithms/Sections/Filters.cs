@@ -164,7 +164,7 @@ namespace Algorithms.Sections
             return result;
         }
 
-        public static Image<Gray, byte> ColorEdgesByOrientation(Image<Gray, byte> inputImage)
+        public static Image<Bgr, byte> ColorEdgesByOrientation(Image<Gray, byte> inputImage)
         {
             Image<Bgr, byte> result = inputImage.Clone().Convert<Bgr, byte>();
             //Image<Gray, byte> result = inputImage.Clone();
@@ -206,9 +206,9 @@ namespace Algorithms.Sections
                         Bgr color = GetColorByOrientation(gradientAngle);
 
                         // Setăm culoarea pixelului în rezultat
-                       result[u, v] = color;
+                        result[u, v] = color;
 
-                        ApplyThinEdges(result, u, v, gradientAngle);
+                        //ApplyThinEdges(result, u, v, gradientAngle);
                        
                     }
                     else
@@ -217,8 +217,8 @@ namespace Algorithms.Sections
                     }
                 }
             }
-            
-            return result.Convert<Gray,byte>();
+
+            return result;
         }
         private static void ApplyThinEdges(Image<Bgr, byte> result, int u, int v, double  angle)
         {
