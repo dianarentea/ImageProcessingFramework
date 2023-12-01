@@ -164,9 +164,11 @@ namespace Algorithms.Sections
             return result;
         }
 
-        public static Image<Bgr, byte> ColorEdgesByOrientation(Image<Gray, byte> inputImage)
+        public static Image<Gray, byte> ColorEdgesByOrientation(Image<Gray, byte> inputImage)
         {
             Image<Bgr, byte> result = inputImage.Clone().Convert<Bgr, byte>();
+            //Image<Gray, byte> result = inputImage.Clone();
+
 
             for (int u = 1; u < inputImage.Rows - 1; u++)
             {
@@ -183,41 +185,74 @@ namespace Algorithms.Sections
                                  inputImage[u + 1, v + 1].Intensity - inputImage[u + 1, v - 1].Intensity;
 
                     double G = Math.Sqrt(Sx * Sx + Sy * Sy); //imagine gradient Grad(x,y)
-                    if (G > 20)                    {
+
+                    if (G > 20)                    
+                    {
                         double gradientAngle = Math.Atan2(Sy, Sx);
+
+                        const double pi = Math.PI;
+
+                        //reducem unghiul la intervalul[-pi / 2, pi / 2]
+                        if (gradientAngle > pi / 2)
+                        {
+                            gradientAngle -= pi;
+                        }
+                        else if (gradientAngle <= -pi / 2)
+                        {
+                            gradientAngle += pi;
+                        }
 
                         // Atribuim culoarea pixelului în funcție de categoria orientării
                         Bgr color = GetColorByOrientation(gradientAngle);
 
                         // Setăm culoarea pixelului în rezultat
-                        result[u, v] = color;
+                       result[u, v] = color;
+
+                        ApplyThinEdges(result, u, v, gradientAngle);
+                       
                     }
                     else
                     {
-                        result[u,v]= new Bgr(0, 0, 0);
+                        result[u,v]= new Bgr(0,0,0);
                     }
                 }
             }
-            return result;
+            
+            return result.Convert<Gray,byte>();
         }
-
-        // Funcție de ajutor pentru a atribui culoarea în funcție de orientare
-        private static Bgr GetColorByOrientation(double angle)
+        private static void ApplyThinEdges(Image<Bgr, byte> result, int u, int v, double  angle)
         {
             const double pi = Math.PI;
 
-            // Normalizarea la intervalul [-2π, 2π]
-            angle = angle % (2* pi);
 
-            //Rotim unghiul la intervalul[-pi / 2, pi / 2]
-            if (angle > pi / 2)
+            if (angle >= -pi / 8 && angle <= pi / 8)
             {
-                angle -= pi;
+                result[u - 1, v] = result[u + 1, v] = new Bgr(0, 0, 0); // colorează în negru pixelii de sus și de jos
+               // result[u, v - 1] = result[u, v + 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din stânga și dreapta
             }
-            else if (angle <= -pi / 2)
+            else if ((angle > -pi / 2 && angle <= -pi / 4) || (angle >= pi / 4 && angle <= pi / 2))
             {
-                angle += pi;
+            //    result[u - 1, v] = result[u + 1, v] = new Bgr(0, 0, 0); // colorează în negru pixelii de sus și de jos
+            result[u, v - 1] = result[u, v + 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din stânga și dreapta
+
             }
+            else if (angle > -3 * pi / 8 && angle < -pi / 8)
+            {
+                //result[u - 1, v + 1] = result[u + 1, v - 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din diagonală 1
+                result[u - 1, v - 1] = result[u + 1, v + 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din diagonală 2
+            }
+            else if (angle > pi / 8 && angle < 3 * pi / 8)
+            {
+               // result[u - 1, v - 1] = result[u + 1, v + 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din diagonală 2
+               result[u - 1, v + 1] = result[u + 1, v - 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din diagonală 1
+            }
+
+        }
+
+        private static Bgr GetColorByOrientation(double angle)
+        {
+
+            const double pi = Math.PI;
 
             // Atribuim culoarea în funcție de orientare
             if (angle >= -pi / 8 && angle <= pi / 8)
