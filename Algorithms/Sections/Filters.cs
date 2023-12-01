@@ -1,6 +1,7 @@
 ﻿using Emgu.CV.Structure;
 using Emgu.CV;
 using System;
+using Emgu.CV.CvEnum;
 
 namespace Algorithms.Sections
 {
@@ -155,13 +156,191 @@ namespace Algorithms.Sections
                    
 
                     double G = Math.Sqrt(Sx*Sx + Sy*Sy); //imagine gradient Grad(x,y)
-                                                            
 
-                    result[u, v] = new Gray(G);
+                    result[u,v]= new Gray(G);
+                    
                 }
             }
 
             return result;
+        }
+        public static Image<Gray, byte> NonmaximaSuppression(Image<Gray, byte> inputImage)
+        {
+           
+            Image<Gray, byte> result = inputImage.Clone();
+
+            for (int u = 1; u < inputImage.Rows - 1; u++)
+            {
+                for (int v = 1; v < inputImage.Cols - 1; v++)
+                {
+                    //masca pentru contururi orizontale
+                    double Sx = inputImage[u + 1, v - 1].Intensity - inputImage[u - 1, v - 1].Intensity +
+                                 2 * inputImage[u + 1, v].Intensity - 2 * inputImage[u - 1, v].Intensity +
+                                 inputImage[u + 1, v + 1].Intensity - inputImage[u - 1, v + 1].Intensity;
+
+                    //masca pentru contururi verticale
+                    double Sy = inputImage[u - 1, v + 1].Intensity - inputImage[u - 1, v - 1].Intensity +
+                                 2 * inputImage[u, v + 1].Intensity - 2 * inputImage[u, v - 1].Intensity +
+                                 inputImage[u + 1, v + 1].Intensity - inputImage[u + 1, v - 1].Intensity;
+
+
+
+                    double G = Math.Sqrt(Sx * Sx + Sy * Sy); //gradient magnitude
+
+                    result[u, v] = new Gray(G); //imaginea gradient - filtrul Sobel
+
+                    if (G > 20)
+                    {
+                        double gradientAngle = Math.Atan2(Sy, Sx);
+
+                        const double pi = Math.PI;
+
+                        //reducem unghiul la intervalul[-pi / 2, pi / 2]
+                        if (gradientAngle > pi / 2)
+                        {
+                            gradientAngle -= pi;
+                        }
+                        else if (gradientAngle <= -pi / 2)
+                        {
+                            gradientAngle += pi;
+                        }
+
+                        ThinEdges(result, u, v, gradientAngle);
+                    }
+                    else
+                    {
+                        result[u, v] = new Gray(0);
+                    }
+                    
+                }
+            }
+            return result;
+        }
+        private static void ThinEdges(Image<Gray, byte> result, int u, int v, double angle)
+        {
+            const double pi = Math.PI;
+
+            double currentPixelValue = result[u, v].Intensity;
+
+            double neighborValue1 = 0, neighborValue2 = 0;
+
+            if (angle >= -pi / 8 && angle <= pi / 8)
+            {
+                neighborValue1 = result[u - 1, v].Intensity;
+                neighborValue2 = result[u + 1, v].Intensity;
+
+                double maxGradient = Math.Max(Math.Max(currentPixelValue, neighborValue1), neighborValue2);
+                if (maxGradient != currentPixelValue)
+                    result[u, v] = new Gray(0);
+                if (maxGradient != neighborValue1)
+                    result[u - 1, v] = new Gray(0);
+                if (maxGradient != neighborValue2)
+                    result[u + 1, v] = new Gray(0);
+
+                //cazul in care am doua valori egale
+                if ((maxGradient == currentPixelValue && maxGradient == neighborValue1) ||
+                    (maxGradient == currentPixelValue && maxGradient == neighborValue2) ||
+                    (maxGradient == neighborValue1 && maxGradient == neighborValue2))
+                {
+
+                    if (currentPixelValue == neighborValue1)
+                    {
+                        result[u-1, v] = new Gray(0); // Păstrăm doar pixelul la stânga
+                    }
+                    else if (currentPixelValue == neighborValue2)
+                    {
+                        result[u+1, v] = new Gray(0); // Păstrăm doar pixelul la dreapta
+                    }
+                }
+            }
+            else if ((angle > -pi / 2 && angle <= -pi / 4) || (angle >= pi / 4 && angle <= pi / 2))
+            {
+                neighborValue1 = result[u, v - 1].Intensity;
+                neighborValue2 = result[u, v + 1].Intensity;
+
+                double maxGradient = Math.Max(Math.Max(currentPixelValue, neighborValue1), neighborValue2);
+                if (maxGradient != currentPixelValue)
+                    result[u, v] = new Gray(0);
+                if (maxGradient != neighborValue1)
+                    result[u, v - 1] = new Gray(0);
+                if (maxGradient != neighborValue2)
+                    result[u, v + 1] = new Gray(0);
+
+                //cazul in care am doua valori egale
+                if ((maxGradient == currentPixelValue && maxGradient == neighborValue1) ||
+                    (maxGradient == currentPixelValue && maxGradient == neighborValue2) ||
+                    (maxGradient == neighborValue1 && maxGradient == neighborValue2))
+                {
+                   
+                    if (currentPixelValue == neighborValue1)
+                    {
+                        result[u, v - 1] = new Gray(0); // Păstrăm doar pixelul la stânga
+                    }
+                    else if (currentPixelValue == neighborValue2)
+                    {
+                        result[u, v + 1] = new Gray(0); // Păstrăm doar pixelul la dreapta
+                    }
+                }
+            }
+            else if (angle > -3 * pi / 8 && angle < -pi / 8)
+            {
+                neighborValue1 = result[u - 1, v + 1].Intensity;
+                neighborValue2 = result[u + 1, v - 1].Intensity;
+
+                double maxGradient = Math.Max(Math.Max(currentPixelValue, neighborValue1), neighborValue2);
+
+                if (maxGradient != currentPixelValue)
+                    result[u, v] = new Gray(0);
+                if (maxGradient != neighborValue1)
+                    result[u - 1, v + 1] = new Gray(0);
+                if (maxGradient != neighborValue2)
+                    result[u + 1, v - 1] = new Gray(0);
+
+                //cazul in care am doua valori egale
+                if ((maxGradient == currentPixelValue && maxGradient == neighborValue1) ||
+                    (maxGradient == currentPixelValue && maxGradient == neighborValue2) ||
+                    (maxGradient == neighborValue1 && maxGradient == neighborValue2))
+                {
+
+                    if (currentPixelValue == neighborValue1)
+                    {
+                        result[u-1, v + 1] = new Gray(0); // Păstrăm doar pixelul la stânga
+                    }
+                    else if (currentPixelValue == neighborValue2)
+                    {
+                        result[u + 1, v - 1] = new Gray(0); // Păstrăm doar pixelul la dreapta
+                    }
+                }
+            }
+            else if (angle > pi / 8 && angle < 3 * pi / 8)
+            {
+                neighborValue1 = result[u - 1, v - 1].Intensity;
+                neighborValue2 = result[u + 1, v + 1].Intensity;
+
+                double maxGradient = Math.Max(Math.Max(currentPixelValue, neighborValue1), neighborValue2);
+                if (maxGradient != currentPixelValue)
+                    result[u, v] = new Gray(0);
+                if (maxGradient != neighborValue1)
+                    result[u - 1, v - 1] = new Gray(0);
+                if (maxGradient != neighborValue2)
+                    result[u + 1, v + 1] = new Gray(0);
+
+                //cazul in care am doua valori egale
+                if ((maxGradient == currentPixelValue && maxGradient == neighborValue1) ||
+                    (maxGradient == currentPixelValue && maxGradient == neighborValue2) ||
+                    (maxGradient == neighborValue1 && maxGradient == neighborValue2))
+                {
+
+                    if (currentPixelValue == neighborValue1)
+                    {
+                        result[u - 1 , v - 1] = new Gray(0); // Păstrăm doar pixelul la stânga
+                    }
+                    else if (currentPixelValue == neighborValue2)
+                    {
+                        result[u +1 , v + 1] = new Gray(0); // Păstrăm doar pixelul la dreapta
+                    }
+                }
+            }
         }
 
         public static Image<Bgr, byte> ColorEdgesByOrientation(Image<Gray, byte> inputImage)
@@ -220,35 +399,7 @@ namespace Algorithms.Sections
 
             return result;
         }
-        private static void ApplyThinEdges(Image<Bgr, byte> result, int u, int v, double  angle)
-        {
-            const double pi = Math.PI;
-
-
-            if (angle >= -pi / 8 && angle <= pi / 8)
-            {
-                result[u - 1, v] = result[u + 1, v] = new Bgr(0, 0, 0); // colorează în negru pixelii de sus și de jos
-               // result[u, v - 1] = result[u, v + 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din stânga și dreapta
-            }
-            else if ((angle > -pi / 2 && angle <= -pi / 4) || (angle >= pi / 4 && angle <= pi / 2))
-            {
-            //    result[u - 1, v] = result[u + 1, v] = new Bgr(0, 0, 0); // colorează în negru pixelii de sus și de jos
-            result[u, v - 1] = result[u, v + 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din stânga și dreapta
-
-            }
-            else if (angle > -3 * pi / 8 && angle < -pi / 8)
-            {
-                //result[u - 1, v + 1] = result[u + 1, v - 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din diagonală 1
-                result[u - 1, v - 1] = result[u + 1, v + 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din diagonală 2
-            }
-            else if (angle > pi / 8 && angle < 3 * pi / 8)
-            {
-               // result[u - 1, v - 1] = result[u + 1, v + 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din diagonală 2
-               result[u - 1, v + 1] = result[u + 1, v - 1] = new Bgr(0, 0, 0); // colorează în negru pixelii din diagonală 1
-            }
-
-        }
-
+       
         private static Bgr GetColorByOrientation(double angle)
         {
 

@@ -999,25 +999,14 @@ namespace Framework.ViewModel
                 return;
             }
             ClearProcessedCanvas(parameter);
-            //List<string> parameters = new List<string>();
-            //parameters.Add("Sigma");
-            //DialogBox box = new DialogBox(_mainVM, parameters);
-            //box.ShowDialog();
-            //List<double> values = box.GetValues();
-            double values = 1;
-            if (values != null)
+
+            if (GrayInitialImage != null)
             {
-                if (GrayInitialImage != null)
-                {
-                    GrayProcessedImage = Filters.GaussianFilter(GrayInitialImage, values);
-                    ProcessedImage = Convert(GrayProcessedImage);
+                GrayProcessedImage = Filters.GaussianFilter(GrayInitialImage, 1);
+                ProcessedImage = Convert(GrayProcessedImage);
                 }
-                else if (ColorInitialImage != null)
-                {
-                    //ColorProcessedImage = Filters.SmoothFilterColor(ColorInitialImage, values[0]);
-                    //ProcessedImage = Convert(ColorProcessedImage);
-                }
-            }
+               
+            
         }
 
         private ICommand _sobelFilterCommand;
@@ -1038,16 +1027,13 @@ namespace Framework.ViewModel
                 return;
             }
             ClearProcessedCanvas(parameter);
-                if (GrayInitialImage != null)
-                {
-                    GrayProcessedImage = Filters.SobelFilter(GrayInitialImage);
-                    ProcessedImage = Convert(GrayProcessedImage);
-                }
-                else if (ColorInitialImage != null)
-                {
-                    //ColorProcessedImage = Filters.SmoothFilterColor(ColorInitialImage, values[0]);
-                    //ProcessedImage = Convert(ColorProcessedImage);
-               }
+            if (GrayInitialImage != null )
+            {
+                GrayInitialImage = Filters.GaussianFilter(GrayInitialImage, 1);
+                GrayProcessedImage = Filters.SobelFilter(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+             }
+
             
         }
 
@@ -1071,14 +1057,37 @@ namespace Framework.ViewModel
             ClearProcessedCanvas(parameter);
             if (GrayInitialImage != null)
             {
+                GrayInitialImage = Filters.GaussianFilter(GrayInitialImage, 1);
                 ColorProcessedImage = Filters.ColorEdgesByOrientation(GrayInitialImage);
                 ProcessedImage = Convert(ColorProcessedImage);
             }
-            else if (ColorInitialImage != null)
+        }
+
+        private ICommand _nonmaximaSuppressionCommand;
+        public ICommand NonmaximaSuppressionCommand
+        {
+            get
             {
-                //ColorProcessedImage = Filters.SmoothFilterColor(ColorInitialImage, values[0]);
-                //ProcessedImage = Convert(ColorProcessedImage);
+                if (_nonmaximaSuppressionCommand == null)
+                    _nonmaximaSuppressionCommand = new RelayCommand(MaximaSuppressionImage);
+                return _nonmaximaSuppressionCommand;
             }
+        }
+        private void MaximaSuppressionImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            if (GrayInitialImage != null)
+            {
+                GrayInitialImage = Filters.GaussianFilter(GrayInitialImage, 1);
+                GrayProcessedImage = Filters.NonmaximaSuppression(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            
         }
 
         #endregion

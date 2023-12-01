@@ -222,11 +222,11 @@
                 <MenuItem Header="High-pass"
                           Foreground="#1E1E1E">
                     <MenuItem Header="Canny operator">
-                        <MenuItem Header="Gradient magnitude image - Gaussian filter"
+                        <MenuItem Header="Gaussian filter"
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.SmoothFilterCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
-                        <MenuItem Header="Sobel filter"
+                        <MenuItem Header="Gradient Magnitude image- Sobel filter"
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.SobelFilterCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
@@ -234,7 +234,10 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.AngleImageCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
-                        <MenuItem Header="Non-maximum suppression"/>
+                        <MenuItem Header="Nonmaxima suppression"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.NonmaximaSuppressionCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
                         <MenuItem Header="Hysteresis thresholding"/>
                         <MenuItem Header="Canny"/>
                     </MenuItem>
