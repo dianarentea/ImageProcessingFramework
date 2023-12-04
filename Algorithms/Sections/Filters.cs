@@ -343,32 +343,62 @@ namespace Algorithms.Sections
                     {
                         result[u, v] = new Gray(255);
                     }
-                    //else
-                    //{
-                    //    bool hasStrongNeighbor = false;
-                    //    for (int i = u - 1; i <= u + 1; i++)
-                    //    {
-                    //        for (int j = v - 1; j <= v + 1; j++)
-                    //        {
-                    //            if (result[i, j].Intensity > tMax)
-                    //            {
-                    //                hasStrongNeighbor = true;
-                    //                break;
-                    //            }
-                    //        }
-                    //        if (hasStrongNeighbor)
-                    //            break;
-                    //    }
-                    //    if (hasStrongNeighbor)
-                    //        result[u, v] = new Gray(255);
-                    //    else
-                    //        result[u, v] = new Gray(0);
-                    //}
+                    else
+                    {
+                        bool hasStrongNeighbor = false;
+                        for (int i = u - 1; i <= u + 1; i++)
+                        {
+                            for (int j = v - 1; j <= v + 1; j++)
+                            {
+                                if (result[i, j].Intensity > tMax)
+                                {
+                                    hasStrongNeighbor = true;
+                                    break;
+                                }
+                            }
+                            if (hasStrongNeighbor)
+                                break;
+                        }
+                        if (hasStrongNeighbor)
+                            result[u, v] = new Gray(255);
+                        else
+                            result[u, v] = new Gray(0);
+                    }
                 }
             }
             return result;
         }
+        public static Image<Gray, byte> CannyFilter(Image<Gray, byte> inputImage, double tMin, double tMax)
+        {
+            inputImage= HysteresisThresholding(inputImage, tMin, tMax);
+            Image<Gray, byte> result = inputImage.Clone();
 
+            for (int u = 1; u < inputImage.Rows - 1; u++)
+            {
+                for (int v = 1; v < inputImage.Cols - 1; v++)
+                {
+                   bool hasStrongNeighbor = false;
+                        for (int i = u - 1; i <= u + 1; i++)
+                        {
+                            for (int j = v - 1; j <= v + 1; j++)
+                            {
+                                if (result[i, j].Intensity > tMax)
+                                {
+                                    hasStrongNeighbor = true;
+                                    break;
+                                }
+                            }
+                            if (hasStrongNeighbor)
+                                break;
+                        }
+                        if (hasStrongNeighbor)
+                            result[u, v] = new Gray(255);
+                        else
+                            result[u, v] = new Gray(0);                
+                }
+            }
+            return result;
+        }
         public static Image<Bgr, byte> ColorEdgesByOrientation(Image<Gray, byte> inputImage)
         {
             Image<Bgr, byte> result = inputImage.Clone().Convert<Bgr, byte>();

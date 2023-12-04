@@ -242,7 +242,10 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.HysteresisThreshldingCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
-                        <MenuItem Header="Canny"/>
+                        <MenuItem Header="Canny"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.CannyFilterCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
                     </MenuItem>
 
                 </MenuItem>
