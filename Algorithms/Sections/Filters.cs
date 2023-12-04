@@ -2,6 +2,7 @@
 using Emgu.CV;
 using System;
 using Emgu.CV.CvEnum;
+using System.Web.UI.WebControls;
 
 namespace Algorithms.Sections
 {
@@ -133,11 +134,12 @@ namespace Algorithms.Sections
                 }
             }
             return result;
-        }
-
+        } 
         public static Image<Gray, byte> SobelFilter(Image<Gray, byte> inputImage)
         {
+            inputImage = GaussianFilter(inputImage, 1.4);
             Image<Gray, byte> result = inputImage.Clone();
+
 
             for (int u = 1; u < inputImage.Rows - 1; u++)
             {
@@ -153,12 +155,18 @@ namespace Algorithms.Sections
                                  2 * inputImage[u, v + 1].Intensity - 2 * inputImage[u, v - 1].Intensity +
                                  inputImage[u + 1, v + 1].Intensity - inputImage[u + 1, v - 1].Intensity;
 
-                   
 
-                    double G = Math.Sqrt(Sx*Sx + Sy*Sy); //imagine gradient Grad(x,y)
 
-                    result[u,v]= new Gray(G);
-                    
+                    double G = Math.Sqrt(Sx * Sx + Sy * Sy); //imagine gradient Grad(x,y)
+                    if (G > 20)
+                    {
+                        result[u, v] = new Gray(G);
+                    }
+                    else
+                    {
+                        result[u, v] = new Gray(0);
+                    }
+
                 }
             }
 
@@ -166,7 +174,8 @@ namespace Algorithms.Sections
         }
         public static Image<Gray, byte> NonmaximaSuppression(Image<Gray, byte> inputImage)
         {
-           
+           inputImage = SobelFilter(inputImage);
+
             Image<Gray, byte> result = inputImage.Clone();
 
             for (int u = 1; u < inputImage.Rows - 1; u++)
@@ -183,14 +192,6 @@ namespace Algorithms.Sections
                                  2 * inputImage[u, v + 1].Intensity - 2 * inputImage[u, v - 1].Intensity +
                                  inputImage[u + 1, v + 1].Intensity - inputImage[u + 1, v - 1].Intensity;
 
-
-
-                    double G = Math.Sqrt(Sx * Sx + Sy * Sy); //gradient magnitude
-
-                    result[u, v] = new Gray(G); //imaginea gradient - filtrul Sobel
-
-                    if (G > 20)
-                    {
                         double gradientAngle = Math.Atan2(Sy, Sx);
 
                         const double pi = Math.PI;
@@ -206,12 +207,7 @@ namespace Algorithms.Sections
                         }
 
                         ThinEdges(result, u, v, gradientAngle);
-                    }
-                    else
-                    {
-                        result[u, v] = new Gray(0);
-                    }
-                    
+
                 }
             }
             return result;
@@ -237,11 +233,7 @@ namespace Algorithms.Sections
                 if (maxGradient != neighborValue2)
                     result[u + 1, v] = new Gray(0);
 
-                //cazul in care am doua valori egale
-                if ((maxGradient == currentPixelValue && maxGradient == neighborValue1) ||
-                    (maxGradient == currentPixelValue && maxGradient == neighborValue2) ||
-                    (maxGradient == neighborValue1 && maxGradient == neighborValue2))
-                {
+            
 
                     if (currentPixelValue == neighborValue1)
                     {
@@ -251,7 +243,7 @@ namespace Algorithms.Sections
                     {
                         result[u+1, v] = new Gray(0); // Păstrăm doar pixelul la dreapta
                     }
-                }
+                
             }
             else if ((angle > -pi / 2 && angle <= -pi / 4) || (angle >= pi / 4 && angle <= pi / 2))
             {
@@ -267,10 +259,7 @@ namespace Algorithms.Sections
                     result[u, v + 1] = new Gray(0);
 
                 //cazul in care am doua valori egale
-                if ((maxGradient == currentPixelValue && maxGradient == neighborValue1) ||
-                    (maxGradient == currentPixelValue && maxGradient == neighborValue2) ||
-                    (maxGradient == neighborValue1 && maxGradient == neighborValue2))
-                {
+               
                    
                     if (currentPixelValue == neighborValue1)
                     {
@@ -280,7 +269,7 @@ namespace Algorithms.Sections
                     {
                         result[u, v + 1] = new Gray(0); // Păstrăm doar pixelul la dreapta
                     }
-                }
+                
             }
             else if (angle > -3 * pi / 8 && angle < -pi / 8)
             {
@@ -297,11 +286,7 @@ namespace Algorithms.Sections
                     result[u + 1, v - 1] = new Gray(0);
 
                 //cazul in care am doua valori egale
-                if ((maxGradient == currentPixelValue && maxGradient == neighborValue1) ||
-                    (maxGradient == currentPixelValue && maxGradient == neighborValue2) ||
-                    (maxGradient == neighborValue1 && maxGradient == neighborValue2))
-                {
-
+               
                     if (currentPixelValue == neighborValue1)
                     {
                         result[u-1, v + 1] = new Gray(0); // Păstrăm doar pixelul la stânga
@@ -310,7 +295,7 @@ namespace Algorithms.Sections
                     {
                         result[u + 1, v - 1] = new Gray(0); // Păstrăm doar pixelul la dreapta
                     }
-                }
+                
             }
             else if (angle > pi / 8 && angle < 3 * pi / 8)
             {
@@ -326,11 +311,7 @@ namespace Algorithms.Sections
                     result[u + 1, v + 1] = new Gray(0);
 
                 //cazul in care am doua valori egale
-                if ((maxGradient == currentPixelValue && maxGradient == neighborValue1) ||
-                    (maxGradient == currentPixelValue && maxGradient == neighborValue2) ||
-                    (maxGradient == neighborValue1 && maxGradient == neighborValue2))
-                {
-
+                
                     if (currentPixelValue == neighborValue1)
                     {
                         result[u - 1 , v - 1] = new Gray(0); // Păstrăm doar pixelul la stânga
@@ -339,8 +320,53 @@ namespace Algorithms.Sections
                     {
                         result[u +1 , v + 1] = new Gray(0); // Păstrăm doar pixelul la dreapta
                     }
+                
+            }
+        }
+        public static Image<Gray, byte> HysteresisThresholding(Image<Gray, byte> inputImage, double tMin, double tMax)
+        {
+            inputImage = NonmaximaSuppression(inputImage);
+
+            Image<Gray, byte> result = inputImage.Clone();
+
+            for (int u = 1; u < inputImage.Rows - 1; u++)
+            {
+                for (int v = 1; v < inputImage.Cols - 1; v++)
+                {
+                    double pixelValue = inputImage[u, v].Intensity;
+
+                    if(pixelValue < tMin)
+                    {
+                        result[u, v] = new Gray(0);
+                    }
+                    else if(pixelValue > tMax)
+                    {
+                        result[u, v] = new Gray(255);
+                    }
+                    //else
+                    //{
+                    //    bool hasStrongNeighbor = false;
+                    //    for (int i = u - 1; i <= u + 1; i++)
+                    //    {
+                    //        for (int j = v - 1; j <= v + 1; j++)
+                    //        {
+                    //            if (result[i, j].Intensity > tMax)
+                    //            {
+                    //                hasStrongNeighbor = true;
+                    //                break;
+                    //            }
+                    //        }
+                    //        if (hasStrongNeighbor)
+                    //            break;
+                    //    }
+                    //    if (hasStrongNeighbor)
+                    //        result[u, v] = new Gray(255);
+                    //    else
+                    //        result[u, v] = new Gray(0);
+                    //}
                 }
             }
+            return result;
         }
 
         public static Image<Bgr, byte> ColorEdgesByOrientation(Image<Gray, byte> inputImage)
@@ -399,7 +425,6 @@ namespace Algorithms.Sections
 
             return result;
         }
-       
         private static Bgr GetColorByOrientation(double angle)
         {
 
@@ -427,6 +452,8 @@ namespace Algorithms.Sections
                 return new Bgr(0, 0, 0); // Negru pentru orice altceva
             }
         }
+
+
 
 
 

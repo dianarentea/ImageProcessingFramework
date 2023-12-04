@@ -238,7 +238,10 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.NonmaximaSuppressionCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
-                        <MenuItem Header="Hysteresis thresholding"/>
+                        <MenuItem Header="Hysteresis thresholding"
+                          Foreground="#1E1E1E"
+                          Command="{Binding Path=MenuCommands.HysteresisThreshldingCommand}"
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
                         <MenuItem Header="Canny"/>
                     </MenuItem>
 

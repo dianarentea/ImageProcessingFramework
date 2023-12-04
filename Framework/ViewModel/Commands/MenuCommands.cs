@@ -1029,7 +1029,6 @@ namespace Framework.ViewModel
             ClearProcessedCanvas(parameter);
             if (GrayInitialImage != null )
             {
-                GrayInitialImage = Filters.GaussianFilter(GrayInitialImage, 1);
                 GrayProcessedImage = Filters.SobelFilter(GrayInitialImage);
                 ProcessedImage = Convert(GrayProcessedImage);
              }
@@ -1069,11 +1068,11 @@ namespace Framework.ViewModel
             get
             {
                 if (_nonmaximaSuppressionCommand == null)
-                    _nonmaximaSuppressionCommand = new RelayCommand(MaximaSuppressionImage);
+                    _nonmaximaSuppressionCommand = new RelayCommand(NonmaximaSuppressionImage);
                 return _nonmaximaSuppressionCommand;
             }
         }
-        private void MaximaSuppressionImage(object parameter)
+        private void NonmaximaSuppressionImage(object parameter)
         {
             if (InitialImage == null)
             {
@@ -1083,13 +1082,45 @@ namespace Framework.ViewModel
             ClearProcessedCanvas(parameter);
             if (GrayInitialImage != null)
             {
-                GrayInitialImage = Filters.GaussianFilter(GrayInitialImage, 1);
                 GrayProcessedImage = Filters.NonmaximaSuppression(GrayInitialImage);
                 ProcessedImage = Convert(GrayProcessedImage);
             }
             
         }
 
+        private ICommand _hysteresisThreshldingCommand;
+        public ICommand HysteresisThreshldingCommand
+        {
+            get
+            {
+                if (_hysteresisThreshldingCommand == null)
+                    _hysteresisThreshldingCommand = new RelayCommand(HysteresisThreshldingImage);
+                return _hysteresisThreshldingCommand;
+            }
+        }
+        private void HysteresisThreshldingImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            List<string> parameters = new List<string>();
+            parameters.Add("T min");
+            parameters.Add("T max");
+            DialogBox box = new DialogBox(_mainVM, parameters);
+            box.ShowDialog();
+            List<double> values = box.GetValues();
+            if (values != null)
+            {
+                if (GrayInitialImage != null)
+                {
+                    GrayProcessedImage = Filters.HysteresisThresholding(GrayInitialImage, values[0], values[1]);
+                    ProcessedImage = Convert(GrayProcessedImage);
+                }
+            }
+        }
         #endregion
 
         #endregion
