@@ -137,7 +137,7 @@ namespace Algorithms.Sections
         } 
         public static Image<Gray, byte> SobelFilter(Image<Gray, byte> inputImage)
         {
-            inputImage = GaussianFilter(inputImage, 1.4);
+            inputImage = GaussianFilter(inputImage, 1.2);
             Image<Gray, byte> result = inputImage.Clone();
 
 
@@ -158,6 +158,7 @@ namespace Algorithms.Sections
 
 
                     double G = Math.Sqrt(Sx * Sx + Sy * Sy); //imagine gradient Grad(x,y)
+
                     if (G > 20)
                     {
                         result[u, v] = new Gray(G);
@@ -226,6 +227,7 @@ namespace Algorithms.Sections
                 neighborValue2 = result[u + 1, v].Intensity;
 
                 double maxGradient = Math.Max(Math.Max(currentPixelValue, neighborValue1), neighborValue2);
+
                 if (maxGradient != currentPixelValue)
                     result[u, v] = new Gray(0);
                 if (maxGradient != neighborValue1)
@@ -233,13 +235,11 @@ namespace Algorithms.Sections
                 if (maxGradient != neighborValue2)
                     result[u + 1, v] = new Gray(0);
 
-            
-
-                    if (currentPixelValue == neighborValue1)
+                    if (currentPixelValue == neighborValue1 && currentPixelValue !=neighborValue2)
                     {
                         result[u-1, v] = new Gray(0); // Păstrăm doar pixelul la stânga
                     }
-                    else if (currentPixelValue == neighborValue2)
+                    else if (currentPixelValue == neighborValue2 && currentPixelValue != neighborValue1)
                     {
                         result[u+1, v] = new Gray(0); // Păstrăm doar pixelul la dreapta
                     }
@@ -261,11 +261,11 @@ namespace Algorithms.Sections
                 //cazul in care am doua valori egale
                
                    
-                    if (currentPixelValue == neighborValue1)
+                    if (currentPixelValue == neighborValue1 && currentPixelValue!=neighborValue2)
                     {
                         result[u, v - 1] = new Gray(0); // Păstrăm doar pixelul la stânga
                     }
-                    else if (currentPixelValue == neighborValue2)
+                    else if (currentPixelValue == neighborValue2 && currentPixelValue != neighborValue1)
                     {
                         result[u, v + 1] = new Gray(0); // Păstrăm doar pixelul la dreapta
                     }
@@ -287,11 +287,11 @@ namespace Algorithms.Sections
 
                 //cazul in care am doua valori egale
                
-                    if (currentPixelValue == neighborValue1)
+                    if (currentPixelValue == neighborValue1 && currentPixelValue != neighborValue2)
                     {
                         result[u-1, v + 1] = new Gray(0); // Păstrăm doar pixelul la stânga
                     }
-                    else if (currentPixelValue == neighborValue2)
+                    else if (currentPixelValue == neighborValue2 && currentPixelValue != neighborValue1)
                     {
                         result[u + 1, v - 1] = new Gray(0); // Păstrăm doar pixelul la dreapta
                     }
@@ -312,11 +312,11 @@ namespace Algorithms.Sections
 
                 //cazul in care am doua valori egale
                 
-                    if (currentPixelValue == neighborValue1)
+                    if (currentPixelValue == neighborValue1 && currentPixelValue != neighborValue2)
                     {
                         result[u - 1 , v - 1] = new Gray(0); // Păstrăm doar pixelul la stânga
                     }
-                    else if (currentPixelValue == neighborValue2)
+                    else if (currentPixelValue == neighborValue2 && currentPixelValue != neighborValue1)
                     {
                         result[u +1 , v + 1] = new Gray(0); // Păstrăm doar pixelul la dreapta
                     }
@@ -344,7 +344,10 @@ namespace Algorithms.Sections
                         result[u, v] = new Gray(255);
                     }
                     else
-                    {
+
+                    //cazul in care valoarea pixelului este intre tMin si tMax
+                    //verific daca are vecini cu norma gradientului mai mare decat tMax
+                    { 
                         bool hasStrongNeighbor = false;
                         for (int i = u - 1; i <= u + 1; i++)
                         {
@@ -368,41 +371,11 @@ namespace Algorithms.Sections
             }
             return result;
         }
-        public static Image<Gray, byte> CannyFilter(Image<Gray, byte> inputImage, double tMin, double tMax)
-        {
-            inputImage= HysteresisThresholding(inputImage, tMin, tMax);
-            Image<Gray, byte> result = inputImage.Clone();
-
-            for (int u = 1; u < inputImage.Rows - 1; u++)
-            {
-                for (int v = 1; v < inputImage.Cols - 1; v++)
-                {
-                   bool hasStrongNeighbor = false;
-                        for (int i = u - 1; i <= u + 1; i++)
-                        {
-                            for (int j = v - 1; j <= v + 1; j++)
-                            {
-                                if (result[i, j].Intensity > tMax)
-                                {
-                                    hasStrongNeighbor = true;
-                                    break;
-                                }
-                            }
-                            if (hasStrongNeighbor)
-                                break;
-                        }
-                        if (hasStrongNeighbor)
-                            result[u, v] = new Gray(255);
-                        else
-                            result[u, v] = new Gray(0);                
-                }
-            }
-            return result;
-        }
         public static Image<Bgr, byte> ColorEdgesByOrientation(Image<Gray, byte> inputImage)
         {
+            inputImage=GaussianFilter(inputImage,1.2);
+
             Image<Bgr, byte> result = inputImage.Clone().Convert<Bgr, byte>();
-            //Image<Gray, byte> result = inputImage.Clone();
 
 
             for (int u = 1; u < inputImage.Rows - 1; u++)

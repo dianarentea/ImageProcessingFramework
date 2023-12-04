@@ -1002,7 +1002,7 @@ namespace Framework.ViewModel
 
             if (GrayInitialImage != null)
             {
-                GrayProcessedImage = Filters.GaussianFilter(GrayInitialImage, 1.4);
+                GrayProcessedImage = Filters.GaussianFilter(GrayInitialImage, 1.2);
                 ProcessedImage = Convert(GrayProcessedImage);
                 }
                
@@ -1056,7 +1056,7 @@ namespace Framework.ViewModel
             ClearProcessedCanvas(parameter);
             if (GrayInitialImage != null)
             {
-                GrayInitialImage = Filters.GaussianFilter(GrayInitialImage, 1.4);
+                //GrayInitialImage = Filters.GaussianFilter(GrayInitialImage, 1.2);
                 ColorProcessedImage = Filters.ColorEdgesByOrientation(GrayInitialImage);
                 ProcessedImage = Convert(ColorProcessedImage);
             }
@@ -1117,40 +1117,6 @@ namespace Framework.ViewModel
                 if (GrayInitialImage != null)
                 {
                     GrayProcessedImage = Filters.HysteresisThresholding(GrayInitialImage, values[0], values[1]);
-                    ProcessedImage = Convert(GrayProcessedImage);
-                }
-            }
-        }
-
-        private ICommand _cannyFilterCommand;
-        public ICommand CannyFilterCommand
-        {
-            get
-            {
-                if (_cannyFilterCommand == null)
-                    _cannyFilterCommand = new RelayCommand(CannyFilterImage);
-                return _cannyFilterCommand;
-            }
-        }
-        private void CannyFilterImage(object parameter)
-        {
-            if (InitialImage == null)
-            {
-                MessageBox.Show("Please add an image !");
-                return;
-            }
-            ClearProcessedCanvas(parameter);
-            List<string> parameters = new List<string>();     
-            parameters.Add("T min");
-            parameters.Add("T max");
-            DialogBox box = new DialogBox(_mainVM, parameters);
-            box.ShowDialog();
-            List<double> values = box.GetValues();
-            if (values != null)
-            {
-                if (GrayInitialImage != null)
-                {
-                    GrayProcessedImage = Filters.CannyFilter(GrayInitialImage, values[0], values[1]);
                     ProcessedImage = Convert(GrayProcessedImage);
                 }
             }
