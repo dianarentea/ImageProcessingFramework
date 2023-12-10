@@ -242,10 +242,10 @@
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.HysteresisThreshldingCommand}"
                           CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
-                        <MenuItem Header="Canny"
+                        <!--<MenuItem Header="Canny"
                           Foreground="#1E1E1E"
                           Command="{Binding Path=MenuCommands.CannyFilterCommand}"
-                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                          CommandParameter="{Binding ElementName=canvasProcessedImage}"/>-->
                     </MenuItem>
 
                 </MenuItem>
@@ -255,6 +255,23 @@
             <MenuItem Header="Morphological operations"
                       Background="{Binding Path=Theme.MenuItemBackgroundColor}"
                       Foreground="{Binding Path=Theme.MenuItemForegroundColor}">
+                <MenuItem Header="Opening"
+                          Foreground="#1E1E1E">
+
+                    <MenuItem Header="Erode"
+                              Foreground="#1E1E1E"
+                            Command="{Binding Path=MenuCommands.ErosionCommand}"
+                            CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                    <MenuItem Header="Dilate"
+                              Foreground="#1E1E1E"
+                              Command="{Binding Path=MenuCommands.DilationCommand}"
+                              CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+                    <MenuItem Header="Opening"
+                              Foreground="#1E1E1E"
+                                Command="{Binding Path=MenuCommands.OpeningCommand}"
+                                CommandParameter="{Binding ElementName=canvasProcessedImage}"/>
+
+                </MenuItem>
 
             </MenuItem>
 

@@ -1056,9 +1056,9 @@ namespace Framework.ViewModel
             ClearProcessedCanvas(parameter);
             if (GrayInitialImage != null)
             {
-                //GrayInitialImage = Filters.GaussianFilter(GrayInitialImage, 1.2);
-                ColorProcessedImage = Filters.ColorEdgesByOrientation(GrayInitialImage);
-                ProcessedImage = Convert(ColorProcessedImage);
+                //ColorProcessedImage = Filters.ColorEdgesByOrientation(GrayInitialImage);
+                GrayProcessedImage= Filters.ColorEdgesGrayByOrientation(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
             }
         }
 
@@ -1126,6 +1126,106 @@ namespace Framework.ViewModel
         #endregion
 
         #region Morphological operations
+
+        private ICommand _dilationCommand;
+        public ICommand DilationCommand
+        {
+            get
+            {
+                if (_dilationCommand == null)
+                    _dilationCommand = new RelayCommand(DilationImage);
+                return _dilationCommand;
+            }
+        }
+        private void DilationImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            List<string> parameters = new List<string>();
+            parameters.Add("Kernel size: ");         
+            DialogBox box = new DialogBox(_mainVM, parameters);
+            box.ShowDialog();
+            List<double> values = box.GetValues();
+            if (values != null)
+            {
+                if (ColorInitialImage != null)
+                {
+                    ColorProcessedImage = MorphologicalOperations.Dilation(ColorInitialImage, (int)values[0]);
+                    ProcessedImage = Convert(ColorProcessedImage);
+                }
+            }
+        }
+
+        private ICommand _erosionCommand;
+        public ICommand ErosionCommand
+        {
+            get
+            {
+                if (_erosionCommand == null)
+                    _erosionCommand = new RelayCommand(ErosionImage);
+                return _erosionCommand;
+            }
+        }
+        private void ErosionImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            List<string> parameters = new List<string>();
+            parameters.Add("Kernel size: ");
+            DialogBox box = new DialogBox(_mainVM, parameters);
+            box.ShowDialog();
+            List<double> values = box.GetValues();
+            if (values != null)
+            {
+                if (ColorInitialImage != null)
+                {
+                    ColorProcessedImage = MorphologicalOperations.Erosion(ColorInitialImage, (int)values[0]);
+                    ProcessedImage = Convert(ColorProcessedImage);
+                }
+            }
+        }
+
+        private ICommand _openingCommand;
+        public ICommand OpeningCommand
+        {
+            get
+            {
+                if (_openingCommand == null)
+                    _openingCommand = new RelayCommand(OpeningImage);
+                return _openingCommand;
+            }
+        }
+        private void OpeningImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image !");
+                return;
+            }
+            ClearProcessedCanvas(parameter);
+            List<string> parameters = new List<string>();
+            parameters.Add("Kernel size: ");
+            DialogBox box = new DialogBox(_mainVM, parameters);
+            box.ShowDialog();
+            List<double> values = box.GetValues();
+            if (values != null)
+            {
+                if (ColorInitialImage != null)
+                {
+                    ColorProcessedImage = MorphologicalOperations.Opening(ColorInitialImage, (int)values[0]);
+                    ProcessedImage = Convert(ColorProcessedImage);
+                }
+            }
+        }
+
         #endregion
 
         #region Geometric transformations
