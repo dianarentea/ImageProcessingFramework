@@ -457,7 +457,7 @@ namespace Algorithms.Sections
                     {
                         double gradientAngle = Math.Atan2(Sy, Sx);
 
-                         gradientAngle = gradientAngle - Math.PI;
+                         gradientAngle = gradientAngle - Math.PI/2;
 
                        
                         const double pi = Math.PI;
@@ -472,11 +472,22 @@ namespace Algorithms.Sections
                         //    gradientAngle += pi;
                         //}
 
+                        Bgr color = GetColorByOrientation(gradientAngle);
+
+                        //reducem unghiul la intervalul[-pi, pi]
+                        if (gradientAngle < -Math.PI)
+                        {
+                            gradientAngle += 2 * Math.PI;
+                        }
+                        else if (gradientAngle >= Math.PI)
+                        {
+                            gradientAngle -= 2 * Math.PI;
+                        }
+
                         Gray color2 = GetGrayImageByAngle(gradientAngle);
 
                         // Atribuim culoarea pixelului în funcție de categoria orientării
-                        Bgr color = GetColorByOrientation(gradientAngle);
-
+                       
                         // Setăm culoarea pixelului în rezultat
                         result[u, v] = color2;
 
@@ -496,8 +507,7 @@ namespace Algorithms.Sections
         private static Gray GetGrayImageByAngle(double angle)
         {
             double angleDegrees = angle * 180 / Math.PI;
-
-            
+         
             double grayColor = (angleDegrees + 180) * 127 / 360 + 128; 
             return new Gray(grayColor);
         }

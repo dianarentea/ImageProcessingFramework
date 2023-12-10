@@ -9,13 +9,14 @@ namespace Algorithms.Sections
         public static Image<Bgr, byte> Erosion(Image<Bgr, byte> inputImage, int kernelSize)
         {
             Image<Bgr, byte> result = inputImage.Clone();
+           
             int kernelRadius = kernelSize / 2;
 
             for (int i = kernelRadius; i < inputImage.Height - kernelRadius; i++)
             {
                 for (int j = kernelRadius; j < inputImage.Width - kernelRadius; j++)
                 {
-                    Bgr minColor = new Bgr(100, 100, 100); // Inițializare cu alb (maximul pentru fiecare canal)
+                    Bgr minColor = new Bgr(255, 255, 255); // Inițializare cu alb (maximul pentru fiecare canal)
 
                     for (int k = -kernelRadius; k <= kernelRadius; k++)
                     {
