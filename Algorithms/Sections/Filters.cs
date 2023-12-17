@@ -410,7 +410,7 @@ namespace Algorithms.Sections
                             gradientAngle += pi;
                         }
 
-                        Gray color2 = GetGrayImageByAngle(gradientAngle);
+                        //Gray color2 = GetGrayImageByAngle(gradientAngle);
 
                         // Atribuim culoarea pixelului în funcție de categoria orientării
                         Bgr color = GetColorByOrientation(gradientAngle);
@@ -418,8 +418,8 @@ namespace Algorithms.Sections
                         // Setăm culoarea pixelului în rezultat
                         result[u, v] = color;
 
-                        //ApplyThinEdges(result, u, v, gradientAngle);
-                       
+                        //ThinEdges(result, u, v, gradientAngle);
+
                     }
                     else
                     {
@@ -463,33 +463,33 @@ namespace Algorithms.Sections
                         const double pi = Math.PI;
 
                         //reducem unghiul la intervalul[-pi / 2, pi / 2]
-                        //if (gradientAngle > pi / 2)
-                        //{
-                        //    gradientAngle -= pi;
-                        //}
-                        //else if (gradientAngle <= -pi / 2)
-                        //{
-                        //    gradientAngle += pi;
-                        //}
+                        if (gradientAngle > pi / 2)
+                        {
+                            gradientAngle -= pi;
+                        }
+                        else if (gradientAngle <= -pi / 2)
+                        {
+                            gradientAngle += pi;
+                        }
 
                         Bgr color = GetColorByOrientation(gradientAngle);
 
-                        //reducem unghiul la intervalul[-pi, pi]
-                        if (gradientAngle < -Math.PI)
-                        {
-                            gradientAngle += 2 * Math.PI;
-                        }
-                        else if (gradientAngle >= Math.PI)
-                        {
-                            gradientAngle -= 2 * Math.PI;
-                        }
+                        ////reducem unghiul la intervalul[-pi, pi]
+                        //if (gradientAngle < -Math.PI)
+                        //{
+                        //    gradientAngle += 2 * Math.PI;
+                        //}
+                        //else if (gradientAngle >= Math.PI)
+                        //{
+                        //    gradientAngle -= 2 * Math.PI;
+                        //}
 
-                        Gray color2 = GetGrayImageByAngle(gradientAngle);
+                        //Gray color2 = GetGrayImageByAngle(gradientAngle);
 
                         // Atribuim culoarea pixelului în funcție de categoria orientării
                        
                         // Setăm culoarea pixelului în rezultat
-                        result[u, v] = color2;
+                        //result[u, v] = color2;
 
                         //ApplyThinEdges(result, u, v, gradientAngle);
 
@@ -503,7 +503,6 @@ namespace Algorithms.Sections
 
             return result;
         }
-       
         private static Gray GetGrayImageByAngle(double angle)
         {
             double angleDegrees = angle * 180 / Math.PI;

@@ -1056,9 +1056,9 @@ namespace Framework.ViewModel
             ClearProcessedCanvas(parameter);
             if (GrayInitialImage != null)
             {
-                //ColorProcessedImage = Filters.ColorEdgesByOrientation(GrayInitialImage);
-                GrayProcessedImage= Filters.ColorEdgesGrayByOrientation(GrayInitialImage);
-                ProcessedImage = Convert(GrayProcessedImage);
+                ColorProcessedImage = Filters.ColorEdgesByOrientation(GrayInitialImage);
+                //GrayProcessedImage= Filters.ColorEdgesGrayByOrientation(GrayInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
             }
         }
 
